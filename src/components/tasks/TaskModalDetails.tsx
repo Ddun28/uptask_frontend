@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import { formatDate } from '@/utils/utils';
 import { statusTranslations } from '@/locales/es';
 import { TaskStatus } from '@/types/index';
+import NotesPanel from '../notes/NotesPanel';
 
 
 export default function TaskModalDetails() {
@@ -85,7 +86,22 @@ export default function TaskModalDetails() {
                                         className="font-black text-4xl text-slate-600 my-5"
                                     >{data.name}
                                     </Dialog.Title>
-                                    <p className='text-lg text-slate-500 mb-2'>{data.description}</p>
+                                    <p className='text-2xl text-slate-500 mb-2'>{data.description}</p>
+
+                                    {data.completedBy.length ? (
+                                      <>
+                                        <p className="font-bold text-2xl text-slate-600 my-5">Notas:</p>
+                                        <p className=''>Historial de Cambios</p>
+                                        <ul className='list-decimal'>
+                                            {data.completedBy.map( (activitylog) => (
+                                                <li key={activitylog._id}>
+                                                    <span className='font-bold text-slate-600'>{statusTranslations[activitylog.status]}</span> {' '} por: {activitylog.user.name}
+                                                </li>
+                                            ))}
+                                        </ul>  
+                                     </>
+                                    ) : null}
+
                                     <div className='my-5 space-y-3'>
                                         <label className='font-bold'>Estado Actual: 
                                             <select className='w-full p-3 bg-white border border-gray-300'
@@ -98,6 +114,10 @@ export default function TaskModalDetails() {
                                             </select>
                                         </label>
                                     </div>
+
+                                    <NotesPanel
+                                        notes={data.notes}
+                                    />
                                 </Dialog.Panel>
                             </Transition.Child>
                         </div>

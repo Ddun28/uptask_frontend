@@ -2,17 +2,22 @@ import { Menu, Transition } from "@headlessui/react"
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid"
 import { useNavigate, useParams } from "react-router-dom"
 import { Fragment } from "react/jsx-runtime"
-import { Task } from "@/types/index"
+import { TaskProject } from "@/types/index"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { deleteTask } from "@/api/TaskAPI"
 import { toast } from "react-toastify"
+import { useDraggable } from "@dnd-kit/core"
 
 type TaskCardProps = {
-    task: Task
+    task: TaskProject
+    canEdit: boolean
 }
 
-export default function TaskCard({task} : TaskCardProps) {
+export default function TaskCard({task, canEdit} : TaskCardProps) {
 
+    const { attributes, listeners, setNodeRef, transform } = useDraggable({
+        id: task._id
+    })
     const navigate = useNavigate()
     const params = useParams()
     const projectId = params.projectId!
@@ -28,15 +33,30 @@ export default function TaskCard({task} : TaskCardProps) {
         }
    })
 
+   const style = transform ? {
+    transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+    padding: "1.25rem",
+    backgroundColor: '#FFF',
+    width: '300px',
+    display:'flex',
+    borderWidth: '1px',
+    borderColor: 'rgb(203 213 225 / var(--tw-border-opacity))'
+
+   } : undefined
+
   return (
     <li className="p-5 bg-white border border-slate-300 flex justify-between gap-3">
-        <div className="min-w-0 flex flex-col gap-y-4">
-    <button
-        type="button"
+        <div
+        {...listeners}        
+        {...attributes}
+        ref={setNodeRef}      
+        style={style}  
+        className="min-w-0 flex flex-col gap-y-4">
+    <p
         className="text-xl font-bold text-slate-600 text-left"
     >
         {task.name}
-    </button>
+    </p>
     <p className="text-slate-500">
         {task.description}
     </p>
@@ -60,7 +80,9 @@ export default function TaskCard({task} : TaskCardProps) {
                                 Ver Tarea
                             </button>
                         </Menu.Item>
-                        <Menu.Item>
+                        {canEdit && (
+                            <>
+                            <Menu.Item>
                             <button 
                                 onClick={() => navigate(location.pathname + `?editTask=${task._id}`)}
                                 type='button' 
@@ -78,6 +100,8 @@ export default function TaskCard({task} : TaskCardProps) {
                                 Eliminar Tarea
                             </button>
                         </Menu.Item>
+                            </>
+                        )}
                     </Menu.Items>
                 </Transition>
             </Menu>

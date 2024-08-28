@@ -1,7 +1,7 @@
 import { getProjectsById } from "@/api/ProjectAPI"
 import { useQuery } from "@tanstack/react-query"
 import { Navigate, useParams } from "react-router-dom"
-import EditProjectForm from "./EditProjectForm"
+import EditProjectForm from "../../components/projects/EditProjectForm"
 
 export default function EditProjectView() {
 
@@ -13,7 +13,6 @@ export default function EditProjectView() {
         queryFn: () => getProjectsById(projectId),
         retry: false
     })
-      
     if(isLoading) return 'Cargando...'
     if(isError) return <Navigate to='/404'/>
     if(data) return <EditProjectForm data={data}/>
